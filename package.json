@@ -1,0 +1,25 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "binstruct": "^0.3.1",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "pug": "^2.0.3",
+    "socket.io": "^2.0.4",
+    "sqlite3": "^4.0.0",
+    "ttn": "^2.3.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:danislab/TTN_BatteryMonitor.git"
+  },
+  "author": "Daniel Luder",
+  "license": "ISC"
+}
