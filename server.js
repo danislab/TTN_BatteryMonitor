@@ -4,6 +4,8 @@ var express = require('express');
 var app = express();
 var pug = require('pug');
 var sqlite3 = require('sqlite3').verbose();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
 app.set('view engine', 'pug');
 app.use(bodyParser.json());
@@ -12,7 +14,6 @@ app.use(express.static('public'));
 var region = 'eu';
 var appID = "danislab_test_application"
 var accessKey = 'ttn-account-v2.LyHGChuHnRuFgVySuUGNKhKioaCzEJrxHpy0NdKcGjw';
-
 var db = new sqlite3.Database('./ttn_database.db');
 
 ttn.data(appID, accessKey)
@@ -24,12 +25,6 @@ ttn.data(appID, accessKey)
     client.on("uplink", function (devID, payload) {
       console.log("Received uplink from ", devID)
       console.log(payload)
-      //console.log(payload.metadata.gateways)
-      //console.log(payload.metadata.time)
-      //console.log(payload.counter)
-      //console.log(payload.payload_raw)
-      //console.log(payload.payload_fields)
-      //console.log(payload.payload_fields.measurement.humidity)
 
       // insert one row into the langs table
       db.run("INSERT INTO measurements(deviceid, counter, time, humidity, temperature) VALUES(?, ?, ?, ?, ?)",
@@ -57,14 +52,25 @@ ttn.data(appID, accessKey)
     process.exit(1)
   })
 
-app.get("/", function(req, res) {
-  res.render('index');
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/index.html');
+});
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on('chat message', function(msg){
+    io.emit('chat message', msg);
+  });
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+});
+
+http.listen(3000, function(){
+  console.log('listening on *:3000');
 });
 
 process.on('exit', function () {
   console.log('About to exit.');
   db.close();
 });
-
-
-
