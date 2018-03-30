@@ -6,6 +6,8 @@ var pug = require('pug');
 var sqlite3 = require('sqlite3').verbose();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var pg = require ('pg');
+const pg_db = require('./db')
 
 app.set('view engine', 'pug');
 app.use(bodyParser.json());
@@ -39,6 +41,9 @@ ttn.data(appID, accessKey)
         console.log(`A row has been inserted with rowid ${this.lastID}`);    // get the last insert id
       });
       // store entire JSON string
+      pg_db.query('INSERT INTO raw_data (json_string) VALUES($1)', [JSON.stringify(payload)], function( queryError, result ) {
+        console.log('queried',queryError);
+      });
       db.run("INSERT INTO RAW_data(JSON_string) VALUES(?)", [JSON.stringify(payload)], function(err) {
         if (err) {
           return console.log(err.message);
