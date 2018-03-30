@@ -38,6 +38,7 @@ ttn.data(appID, accessKey)
       // store entire JSON string
       pg_db.query('INSERT INTO raw_data (json_string) VALUES($1)', [JSON.stringify(payload)], (err, res) => { });
       io.emit('chat message', [JSON.stringify(payload)]);
+      io.emit('table', 'hier sollte meine Tabelle sein');
     })
   })
   .catch(function (err) {
@@ -46,7 +47,12 @@ ttn.data(appID, accessKey)
   })
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/web/index.html');
+});
+
+app.get('/overview', function(req, res){
+  res.sendFile(__dirname + '/web/overview.html');
+  io.emit('table', 'hier sollte meine Tabelle sein');
 });
 
 io.on('connection', function(socket){
