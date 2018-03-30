@@ -24,8 +24,8 @@ ttn.data(appID, accessKey)
     console.log("Prepared database")
 
     client.on("uplink", function (devID, payload) {
-      console.log("Received uplink from ", devID)
-      console.log(payload)
+      console.log("Received uplink from ", devID, "counter", payload.counter)
+      //console.log(payload)
 
       // insert one row into the langs table
       pg_db.query('INSERT INTO measurements(deviceid, counter, time, humidity, temperature) VALUES($1, $2, $3, $4, $5)',
@@ -37,6 +37,7 @@ ttn.data(appID, accessKey)
 
       // store entire JSON string
       pg_db.query('INSERT INTO raw_data (json_string) VALUES($1)', [JSON.stringify(payload)], (err, res) => { });
+      io.emit('chat message', [JSON.stringify(payload)]);
     })
   })
   .catch(function (err) {
