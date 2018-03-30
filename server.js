@@ -19,12 +19,8 @@ ttn.data(appID, accessKey)
   .then(function (client) {
     console.log("Connected to TTN")
 
-    pg_db.query('CREATE TABLE IF NOT EXISTS measurements (id SERIAL PRIMARY KEY, deviceid TEXT, counter INTEGER, time TEXT, humidity REAL, temperature REAL)', function( queryError, result ) {
-      console.log('queried',queryError);
-    });
-    pg_db.query('CREATE TABLE IF NOT EXISTS raw_data(id SERIAL PRIMARY KEY, json_string TEXT)', function( queryError, result ) {
-      console.log('queried',queryError);
-    });
+    pg_db.query('CREATE TABLE IF NOT EXISTS measurements (id SERIAL PRIMARY KEY, deviceid TEXT, counter INTEGER, time TEXT, humidity REAL, temperature REAL)', (err, res) => { });
+    pg_db.query('CREATE TABLE IF NOT EXISTS raw_data(id SERIAL PRIMARY KEY, json_string TEXT)', (err, res) => { });
     console.log("Prepared database")
 
     client.on("uplink", function (devID, payload) {
@@ -37,15 +33,10 @@ ttn.data(appID, accessKey)
       payload.counter,
       payload.metadata.time,
       payload.payload_fields.measurement.humidity,
-      payload.payload_fields.measurement.temperature],
-      function( queryError, result ) {
-        console.log('queried',queryError);
-      });
+      payload.payload_fields.measurement.temperature], (err, res) => { });
 
       // store entire JSON string
-      pg_db.query('INSERT INTO raw_data (json_string) VALUES($1)', [JSON.stringify(payload)], function( queryError, result ) {
-        console.log('queried',queryError);
-      });
+      pg_db.query('INSERT INTO raw_data (json_string) VALUES($1)', [JSON.stringify(payload)], (err, res) => { });
     })
   })
   .catch(function (err) {
