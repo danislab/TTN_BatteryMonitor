@@ -3,10 +3,8 @@ var bodyParser = require('body-parser');
 var express = require('express');
 var app = express();
 var pug = require('pug');
-//var sqlite3 = require('sqlite3').verbose();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-//var pg = require ('pg');
 const pg_db = require('./db')
 
 app.set('view engine', 'pug');
@@ -16,13 +14,10 @@ app.use(express.static('public'));
 var region = 'eu';
 var appID = "danislab_test_application"
 var accessKey = 'ttn-account-v2.LyHGChuHnRuFgVySuUGNKhKioaCzEJrxHpy0NdKcGjw';
-//var db = new sqlite3.Database('./ttn_database.db');
 
 ttn.data(appID, accessKey)
   .then(function (client) {
     console.log("Connected to TTN")
-    /*db.run("CREATE TABLE IF NOT EXISTS measurements (deviceid TEXT, counter INTEGER, time TEXT, humidity REAL, temperature REAL)");
-    db.run("CREATE TABLE IF NOT EXISTS RAW_data (JSON_string TEXT)");*/
 
     pg_db.query('CREATE TABLE IF NOT EXISTS measurements (id SERIAL PRIMARY KEY, deviceid TEXT, counter INTEGER, time TEXT, humidity REAL, temperature REAL)', function( queryError, result ) {
       console.log('queried',queryError);
@@ -46,27 +41,11 @@ ttn.data(appID, accessKey)
       function( queryError, result ) {
         console.log('queried',queryError);
       });
-      /*db.run("INSERT INTO measurements(deviceid, counter, time, humidity, temperature) VALUES(?, ?, ?, ?, ?)",
-        [payload.dev_id,
-        payload.counter,
-        payload.metadata.time,
-        payload.payload_fields.measurement.humidity,
-        payload.payload_fields.measurement.temperature], function(err) {
-        if (err) {
-          return console.log(err.message);
-        }
-        console.log(`A row has been inserted with rowid ${this.lastID}`);    // get the last insert id
-      });*/
+
       // store entire JSON string
       pg_db.query('INSERT INTO raw_data (json_string) VALUES($1)', [JSON.stringify(payload)], function( queryError, result ) {
         console.log('queried',queryError);
       });
-      /*db.run("INSERT INTO RAW_data(JSON_string) VALUES(?)", [JSON.stringify(payload)], function(err) {
-        if (err) {
-          return console.log(err.message);
-        }
-        //console.log(`A row has been inserted with rowid ${this.lastID}`);    // get the last insert id
-      });*/
     })
   })
   .catch(function (err) {
