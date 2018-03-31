@@ -19,7 +19,7 @@ ttn.data(appID, accessKey)
   .then(function (client) {
     console.log("Connected to TTN")
 
-    pg_db.query('CREATE TABLE IF NOT EXISTS measurements (id SERIAL PRIMARY KEY, deviceid TEXT, counter INTEGER, time TEXT, humidity REAL, temperature REAL)', (err, res) => { });
+    pg_db.query('CREATE TABLE IF NOT EXISTS measurements (id SERIAL PRIMARY KEY, deviceid TEXT, counter INTEGER, time TIMESTAMPTZ, humidity REAL, temperature REAL)', (err, res) => { });
     pg_db.query('CREATE TABLE IF NOT EXISTS raw_data(id SERIAL PRIMARY KEY, json_string TEXT)', (err, res) => { });
     console.log("Prepared database")
 
@@ -38,7 +38,7 @@ ttn.data(appID, accessKey)
       // store entire JSON string
       pg_db.query('INSERT INTO raw_data (json_string) VALUES($1)', [JSON.stringify(payload)], (err, res) => { });
       io.emit('chat message', [JSON.stringify(payload)]);
-      io.emit('table', 'hier sollte meine Tabelle sein');
+      io.emit('table', payload.metadata.time);
     })
   })
   .catch(function (err) {
