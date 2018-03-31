@@ -38,7 +38,11 @@ ttn.data(appID, accessKey)
       // store entire JSON string
       pg_db.query('INSERT INTO raw_data (json_string) VALUES($1)', [JSON.stringify(payload)], (err, res) => { });
       io.emit('chat message', [JSON.stringify(payload)]);
-      io.emit('table', payload.metadata.time);
+      //io.emit('table', payload.metadata.time);
+      pg_db.query('SELECT * FROM measurements', (err, res) => {
+        console.log(JSON.stringify(res.rows[1]))
+        io.emit('table', JSON.stringify(res.rows));
+      });
     })
   })
   .catch(function (err) {
@@ -48,6 +52,10 @@ ttn.data(appID, accessKey)
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/web/index.html');
+});
+
+app.get('/dbtest', function(req, res){
+  res.sendFile(__dirname + '/web/dbtest.html');
 });
 
 app.get('/overview', function(req, res){
