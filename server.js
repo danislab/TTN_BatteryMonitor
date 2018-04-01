@@ -63,6 +63,10 @@ app.get('/rt', function(req, res){
   res.sendFile(__dirname + '/web/rt_table.html');
 });
 
+app.get('/console', function(req, res){
+  res.sendFile(__dirname + '/web/console.html');
+});
+
 app.get('/dbtest', function(req, res){
   res.sendFile(__dirname + '/web/dbtest.html');
   io.emit('table', JSON.stringify(res.rows));

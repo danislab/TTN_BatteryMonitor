@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<script>
+var container = angular.module("AdminApp", []);
+container.controller("StatsController", function($scope) {
+    var socket = io.connect();
+    socket.on('table', function (msg) {
+        console.log(msg);
+        $scope.$apply(function(){
+          $scope.message = JSON.parse(msg);
+        });
+    });
+});
+</script>
+
+<body ng-app="AdminApp">
+  <div ng-controller="StatsController">
+    <h1 class="text-center">TTN_BatteryMonitor Console</h1>
+    <p> {{message}} </p>
+  </div>
+</body>
+</html>
