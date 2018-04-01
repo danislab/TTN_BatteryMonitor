@@ -40,12 +40,6 @@ ttn.data(appID, accessKey)
       io.emit('chat message', [JSON.stringify(payload)]);
       //io.emit('table', payload.metadata.time);
       pg_db.query('SELECT * FROM measurements', (err, res) => {
-      /*pg_db.query('SELECT * FROM measurements', function(err, res) {
-    		//pg_db.done(); // Call done() to release the client back to the pool
-    		if(err) {
-    			return console.error('Query error', err);
-    		}*/
-        //console.log(JSON.stringify(res.rows[1]))
         io.emit('table', JSON.stringify(res.rows));
       });
     })
@@ -56,25 +50,15 @@ ttn.data(appID, accessKey)
   })
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/web/index.html');
+  res.sendFile(__dirname + '/public/index.html');
 });
 
 app.get('/rt', function(req, res){
-  res.sendFile(__dirname + '/web/rt_table.html');
+  res.sendFile(__dirname + '/public/rt_table.html');
 });
 
 app.get('/console', function(req, res){
-  res.sendFile(__dirname + '/web/console.html');
-});
-
-app.get('/dbtest', function(req, res){
-  res.sendFile(__dirname + '/web/dbtest.html');
-  io.emit('table', JSON.stringify(res.rows));
-});
-
-app.get('/overview', function(req, res){
-  res.sendFile(__dirname + '/web/overview.html');
-  io.emit('table', 'hier sollte meine Tabelle sein');
+  res.sendFile(__dirname + '/public/console.html');
 });
 
 io.on('connection', function(socket){
