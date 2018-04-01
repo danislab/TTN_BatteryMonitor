@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+var container = angular.module("AdminApp", []);
+container.controller("StatsController", function($scope) {
+    var socket = io.connect();
+    socket.on('table', function (msg) {
+        console.log(msg);
+        $scope.$apply(function(){
+          //$scope.message = msg;
+          $scope.message = JSON.stringify(msg);
+        });
+    });
+});
+</script>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope) {
+    $scope.carname = "Volvo";
+});
+</script>
+
+<body ng-app="AdminApp">
+
+  <div ng-controller="StatsController">
+    <h1>TTN_BatteryMonitor Real Time Table</h1>
+    <p>Message beginnt hier > {{message}} < und hier fertig</p>
+
+    <table>
+      <tr ng-repeat="x in message">
+        <td>{{ x.id }}</td>
+        <td>{{ x.humidity }}</td>
+      </tr>
+    </table>
+  </div>
+
+</body>
+</html>

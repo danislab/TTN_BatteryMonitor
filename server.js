@@ -59,8 +59,8 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/web/index.html');
 });
 
-app.get('/angular_test', function(req, res){
-  res.sendFile(__dirname + '/web/angular_test.html');
+app.get('/rt', function(req, res){
+  res.sendFile(__dirname + '/web/rt_table.html');
 });
 
 app.get('/dbtest', function(req, res){
