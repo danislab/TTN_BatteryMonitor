@@ -47,7 +47,7 @@ void os_getDevEui (u1_t* buf) { }
 void os_getDevKey (u1_t* buf) { }
 
 static uint8_t mydata[] = "ABCDEFGH";
-uint8_t measurement[2];
+uint8_t measurement[4];
 static osjob_t sendjob;
 
 // Schedule TX every this many seconds (might become longer due to duty
@@ -145,20 +145,92 @@ void onEvent (ev_t ev) {
 void do_send(osjob_t* j) {
   byte buffer[8];
   sensorValue = analogRead(analogInPin);
-  float t = random(17, 28)/10;
+  float temperature = random(10, 30)/10 - 10;
+//  float temperature_min = random(10, 30)/10;
+//  float temperature_max = random(10, 30)/10;
   float h = map(sensorValue, 0, 1024, 0, 100);
-  t = t - 10;
-  int32_t temp = t * 10;
+  int32_t temp = temperature * 10;
   int32_t humidity = round(h);
   measurement[0] = temp;
   measurement[1] = humidity;
+
+
+  uint8_t data_buffer[9];
+
+  //uint8_t temperature_mean = 10;
+  //uint8_t temperature_difference;
+  
+  float BMS_temperature_mean = 25.5;
+  float BMS_temperature_min = 24.1;
+  float BMS_temperature_max = 27.8;
+
+  BMS_temperature_mean = 25;
+  BMS_temperature_min = 15;
+  BMS_temperature_max = 40;
+
+  float BMS_cell_voltage_mean_mV = 4000;
+  float BMS_cell_voltage_min_mV = 3900;
+  float BMS_cell_voltage_max_mV = 4200;
+
+  uint16_t cell_voltage_mean;
+  uint8_t cell_voltage_min;
+  uint8_t cell_voltage_max;
+
+  uint16_t temperature_mean_offset;
+  uint8_t temperature_min_offset;
+  uint8_t temperature_max_offset;
+
+  uint8_t SOC = 73;
+  uint8_t SOH = 95;
+
+  cell_voltage_mean = (BMS_cell_voltage_mean_mV - 2450) * 65536 / 1800;
+  cell_voltage_min = (BMS_cell_voltage_mean_mV - BMS_cell_voltage_min_mV) * 256 / 250;
+  cell_voltage_max = (BMS_cell_voltage_max_mV - BMS_cell_voltage_mean_mV) * 256 / 250;
+
+  temperature_mean_offset = (BMS_temperature_mean + 20) * 1024 / 100;
+  temperature_min_offset = (BMS_temperature_mean - BMS_temperature_min) * 128 / 20;
+  temperature_max_offset = (BMS_temperature_max - BMS_temperature_mean) * 128 / 20;
+  //temperature_mean_offset = 7;
+  //temperature_min_offset = 2;
+  //temperature_max_offset = 2;
+  
+  //data_buffer[0] = highByte(temperature_mean_offset);
+  data_buffer[0] = ((temperature_mean_offset & 0x03FC) >> 2);
+  data_buffer[1] = ((temperature_min_offset & 0x7E) >> 1) + ((temperature_mean_offset & 3) << 6);
+  data_buffer[2] = ((temperature_min_offset & 0x01) << 7) + (temperature_max_offset & 0x7F);
+  
+  data_buffer[3] = highByte(cell_voltage_mean);
+  data_buffer[4] = lowByte(cell_voltage_mean);
+  data_buffer[5] = cell_voltage_min;
+  data_buffer[6] = cell_voltage_max;
+
+  data_buffer[7] = SOC;
+  data_buffer[8] = SOH;
+
+  Serial.print(temperature_mean_offset);
+  Serial.print("    ");
+  Serial.print(temperature_mean_offset);
+  Serial.print("    ");
+  Serial.print(temperature_min_offset);
+  Serial.print("    ");
+  Serial.print(temperature_max_offset);
+  Serial.print("    ");
+  Serial.print((temperature_min_offset & 0x01) << 7) + (temperature_max_offset & 0x7F);
+  Serial.print("    ");
+  
+  for (int i = 0; i < sizeof(data_buffer); i++) {
+    Serial.print(data_buffer[i]);
+    Serial.print(" ");
+  }
+
+  Serial.println();
 
   // Check if there is not a current TX/RX job running
   if (LMIC.opmode & OP_TXRXPEND) {
     Serial.println(F("OP_TXRXPEND, not sending"));
   } else {
     // Prepare upstream data transmission at the next possible time.
-    LMIC_setTxData2(1, (uint8_t*) measurement, sizeof(measurement), 0);
+    LMIC_setTxData2(1, (uint8_t*) data_buffer, sizeof(data_buffer), 0);
     Serial.println(F("Packet queued"));
   }
   // Next TX is scheduled after TX_COMPLETE event.
@@ -229,5 +301,67 @@ void setup() {
 }
 
 void loop() {
+  /*
+  uint8_t data_buffer[5];
+  sensorValue = analogRead(analogInPin);
+  
+  int16_t temperature_mean = random(-200, 800);
+  temperature_mean = -10;
+  data_buffer[1] = temperature_mean;
+  int16_t temperature_min = temperature_mean + random(-200, 0);
+  int16_t temperature_max = temperature_mean + random(0, 200);
+
+  int16_t cell_voltage_mean = random(2450, 4250);
+  int16_t cell_voltage_min = cell_voltage_mean + random(-250, 0);
+  int16_t cell_voltage_max = cell_voltage_mean + random(0, 250);
+  
+  float h = map(sensorValue, 0, 1024, 0, 100);
+  int32_t humidity = round(h);*/
+/*
+  uint16_t cell_voltage_mean;
+  int8_t cell_voltage_min;
+  int8_t cell_voltage_max;
+
+  float BMS_cell_voltage_mean_mV = 3987;
+  float BMS_cell_voltage_min_mV = 3887;
+  float BMS_cell_voltage_max_mV = 4000;
+  
+  cell_voltage_mean = (BMS_cell_voltage_mean_mV - 2450) * 65536 / 1800;
+  cell_voltage_min = (BMS_cell_voltage_min_mV - 2450) * 256 / 1800;
+  cell_voltage_max = (BMS_cell_voltage_max_mV - 2450) * 256 / 1800;
+  
+  Serial.println(cell_voltage_mean);
+  byte payload[2];
+  payload[0] = highByte(cell_voltage_mean);
+  payload[1] = lowByte(cell_voltage_mean);
+  for (int i = 0; i < sizeof(payload); i++) {
+    Serial.print(payload[i]);
+    Serial.print(" ");
+  }
+*/
+/*
+  Serial.print(temperature_mean);
+  Serial.print("    ");
+  Serial.print(temperature_min);
+  Serial.print("    ");
+  Serial.print(temperature_max);
+  Serial.print("    ");
+  Serial.print(cell_voltage_mean);
+  Serial.print("    ");
+  Serial.print(cell_voltage_min);
+  Serial.print("    ");
+  Serial.print(cell_voltage_max);
+  Serial.print("    ");
+  
+  for (int i = 0; i < sizeof(data_buffer); i++) {
+    Serial.print(data_buffer[i]);
+    Serial.print(" ");
+  }
+
+  Serial.println();
+
+  delay(500);
+*/
+  
   os_runloop_once();
 }
