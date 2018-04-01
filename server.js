@@ -40,7 +40,12 @@ ttn.data(appID, accessKey)
       io.emit('chat message', [JSON.stringify(payload)]);
       //io.emit('table', payload.metadata.time);
       pg_db.query('SELECT * FROM measurements', (err, res) => {
-        console.log(JSON.stringify(res.rows[1]))
+      /*pg_db.query('SELECT * FROM measurements', function(err, res) {
+    		//pg_db.done(); // Call done() to release the client back to the pool
+    		if(err) {
+    			return console.error('Query error', err);
+    		}*/
+        //console.log(JSON.stringify(res.rows[1]))
         io.emit('table', JSON.stringify(res.rows));
       });
     })
@@ -54,8 +59,13 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/web/index.html');
 });
 
+app.get('/angular_test', function(req, res){
+  res.sendFile(__dirname + '/web/angular_test.html');
+});
+
 app.get('/dbtest', function(req, res){
   res.sendFile(__dirname + '/web/dbtest.html');
+  io.emit('table', JSON.stringify(res.rows));
 });
 
 app.get('/overview', function(req, res){
@@ -65,6 +75,9 @@ app.get('/overview', function(req, res){
 
 io.on('connection', function(socket){
   console.log('a user connected');
+  pg_db.query('SELECT * FROM measurements', (err, res) => {
+    io.emit('table', JSON.stringify(res.rows));
+  });
   socket.on('chat message', function(msg){
     io.emit('chat message', msg);
   });
