@@ -11,25 +11,15 @@ container.controller("StatsController", function($scope) {
     socket.on('table', function (msg) {
         console.log(msg);
         $scope.$apply(function(){
-          //$scope.message = msg;
           $scope.message = JSON.parse(msg);
         });
     });
 });
 </script>
 
-<script>
-var app = angular.module('myApp', []);
-app.controller('myCtrl', function($scope) {
-    $scope.carname = "Volvo";
-});
-</script>
-
 <body ng-app="AdminApp">
-
   <div ng-controller="StatsController">
     <h1 class="text-center">TTN_BatteryMonitor Real Time Table</h1>
-    <!-- <p>Message beginnt hier > {{message}} < und hier fertig</p>  -->
     <table class="table">
       <tr>
         <th>id</th>
@@ -49,6 +39,5 @@ app.controller('myCtrl', function($scope) {
       </tr>
     </table>
   </div>
-
 </body>
 </html>
