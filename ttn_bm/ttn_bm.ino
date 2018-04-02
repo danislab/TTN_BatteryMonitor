@@ -157,11 +157,11 @@ void do_send(osjob_t* j) {
   
   float BMS_temperature_mean = 25.5;
   float BMS_temperature_min = 24.1;
-  float BMS_temperature_max = 27.8;
+  float BMS_temperature_max = random(-2000, 8000)/100.0;
 
   float BMS_cell_voltage_mean_mV = 4000;
   float BMS_cell_voltage_min_mV = 3900;
-  float BMS_cell_voltage_max_mV = 4200;
+  float BMS_cell_voltage_max_mV = random(2450, 4250);
 
   uint16_t cell_voltage_mean;
   uint8_t cell_voltage_min;
@@ -172,7 +172,7 @@ void do_send(osjob_t* j) {
   uint8_t temperature_max_offset;
 
   uint8_t SOC = 73;
-  uint8_t SOH = 95;
+  uint8_t SOH = random(0, 100);
 
   uint8_t charged_capacity_As = 50;
   uint8_t discharged_capacity_As = 125;
