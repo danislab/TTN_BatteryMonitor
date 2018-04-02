@@ -6,26 +6,26 @@ function Decoder(bytes, port) {
 	var cell_voltage_mean = 2.45 + ((bytes[3] << 8) + bytes[4]) * 1.8 / 65536;
 	var cell_voltage_min = cell_voltage_mean - bytes[5] * 0.25 / 256;
 	var cell_voltage_max = cell_voltage_mean + bytes[6] * 0.25 / 256;
-	var SOC = bytes[7];
-	var SOH = bytes[8];
-	var charged_capacity_As = (bytes[9] & 0x7F);
-	var discharged_capacity_As  = bytes[10];
+	var soc = bytes[7];
+	var soh = bytes[8];
+	var charged_capacity_1cs = (bytes[9] & 0x7F);
+	var discharged_capacity_1cs  = bytes[10];
 	// leave this
 	var temperature = (bytes[0]) / 10;
 	var humidity = (bytes[1]);
 
 	return {
 		measurement: {
-			temperature_mean: temperature_mean,
-			temperature_min: temperature_min,
-			temperature_max: temperature_max,
-			cell_voltage_mean: cell_voltage_mean,
-			cell_voltage_min: cell_voltage_min,
-			cell_voltage_max: cell_voltage_max,
-			SOC: SOC,
-			SOH: SOH,
-			charged_capacity_As: charged_capacity_As,
-			discharged_capacity_As: discharged_capacity_As,
+			temperature_mean: Math.round(temperature_mean * 100) / 100,
+			temperature_min: Math.round(temperature_min * 100) / 100,
+			temperature_max: Math.round(temperature_max * 100) / 100,
+			cell_voltage_mean: Math.round(cell_voltage_mean * 1000) / 1000,
+			cell_voltage_min: Math.round(cell_voltage_min * 1000) / 1000,
+			cell_voltage_max: Math.round(cell_voltage_max * 1000) / 1000,
+			soc: soc,
+			soh: soh,
+			charged_capacity_1cs: charged_capacity_1cs,
+			discharged_capacity_1cs: discharged_capacity_1cs,
 			temperature: temperature,
 			humidity: humidity
 		},
