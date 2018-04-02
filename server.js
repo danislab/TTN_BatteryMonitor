@@ -19,21 +19,46 @@ ttn.data(appID, accessKey)
   .then(function (client) {
     console.log("Connected to TTN")
 
-    pg_db.query('CREATE TABLE IF NOT EXISTS measurements (id SERIAL PRIMARY KEY, deviceid TEXT, counter INTEGER, time TIMESTAMPTZ, humidity REAL, temperature REAL)', (err, res) => { });
+    pg_db.query('CREATE TABLE IF NOT EXISTS measurements ( \
+      id SERIAL PRIMARY KEY, \
+      deviceid TEXT, \
+      counter INTEGER, \
+      time TIMESTAMPTZ, \
+      soc INTEGER, \
+      soh INTEGER, \
+      cell_voltage_mean REAL, \
+      cell_voltage_min REAL, \
+      cell_voltage_max REAL, \
+      temperature_mean REAL, \
+      temperature_min REAL, \
+      temperature_max REAL, \
+      charged_capacity_1cs INTEGER, \
+      discharged_capacity_1cs INTEGER)', (err, res) => { });
     pg_db.query('CREATE TABLE IF NOT EXISTS raw_data(id SERIAL PRIMARY KEY, json_string TEXT)', (err, res) => { });
     console.log("Prepared database")
 
     client.on("uplink", function (devID, payload) {
       console.log("Received uplink from ", devID, "counter", payload.counter)
-      //console.log(payload)
+      //console.log(payload.payload_fields.measurement)
 
-      // insert one row into the langs table
-      pg_db.query('INSERT INTO measurements(deviceid, counter, time, humidity, temperature) VALUES($1, $2, $3, $4, $5)',
+      pg_db.query('INSERT INTO measurements(deviceid, counter, time, soc, soh, \
+        cell_voltage_mean, cell_voltage_min, cell_voltage_max, \
+        temperature_mean, temperature_min, temperature_max, \
+        charged_capacity_1cs, discharged_capacity_1cs \
+      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
       [payload.dev_id,
       payload.counter,
       payload.metadata.time,
-      payload.payload_fields.measurement.humidity,
-      payload.payload_fields.measurement.temperature], (err, res) => { });
+      payload.payload_fields.measurement.soc,
+      payload.payload_fields.measurement.soh,
+      payload.payload_fields.measurement.cell_voltage_mean,
+      payload.payload_fields.measurement.cell_voltage_min,
+      payload.payload_fields.measurement.cell_voltage_max,
+      payload.payload_fields.measurement.temperature_mean,
+      payload.payload_fields.measurement.temperature_min,
+      payload.payload_fields.measurement.temperature_max,
+      payload.payload_fields.measurement.charged_capacity_1cs,
+      payload.payload_fields.measurement.discharged_capacity_1cs], (err, res) => { });
 
       // store entire JSON string
       pg_db.query('INSERT INTO raw_data (json_string) VALUES($1)', [JSON.stringify(payload)], (err, res) => { });
