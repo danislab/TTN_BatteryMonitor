@@ -26,16 +26,32 @@ container.controller("StatsController", function($scope) {
         <th>deviceid</th>
         <th>counter</th>
         <th>time</th>
-        <th>humidity</th>
-        <th>temperature</th>
+        <th>SOC</th>
+        <th>SOH</th>
+        <th>cell_voltage_mean</th>
+        <th>cell_voltage_min</th>
+        <th>cell_voltage_max</th>
+        <th>temperature_mean</th>
+        <th>temperature_min</th>
+        <th>temperature_max</th>
+        <th>charged_capacity_1cs</th>
+        <th>discharged_capacity_1cs</th>
       </tr>
       <tr ng-repeat="x in message">
         <td>{{ x.id }}</td>
         <td>{{ x.deviceid }}</td>
         <td>{{ x.counter }}</td>
         <td>{{ x.time }}</td>
-        <td>{{ x.humidity }}</td>
-        <td>{{ x.temperature }}</td>
+        <td>{{ x.soc }}</td>
+        <td>{{ x.soh }}</td>
+        <td>{{ x.cell_voltage_mean }}</td>
+        <td>{{ x.cell_voltage_min }}</td>
+        <td>{{ x.cell_voltage_max }}</td>
+        <td>{{ x.temperature_mean }}</td>
+        <td>{{ x.temperature_min }}</td>
+        <td>{{ x.temperature_max }}</td>
+        <td>{{ x.charged_capacity_1cs }}</td>
+        <td>{{ x.discharged_capacity_1cs }}</td>
       </tr>
     </table>
   </div>
