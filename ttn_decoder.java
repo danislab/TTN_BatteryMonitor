@@ -8,6 +8,8 @@ function Decoder(bytes, port) {
 	var cell_voltage_max = cell_voltage_mean + bytes[6] * 0.25 / 256;
 	var SOC = bytes[7];
 	var SOH = bytes[8];
+	var charged_capacity_As = (bytes[9] & 0x7F);
+	var discharged_capacity_As  = bytes[10];
 	// leave this
 	var temperature = (bytes[0]) / 10;
 	var humidity = (bytes[1]);
@@ -22,6 +24,8 @@ function Decoder(bytes, port) {
 			cell_voltage_max: cell_voltage_max,
 			SOC: SOC,
 			SOH: SOH,
+			charged_capacity_As: charged_capacity_As,
+			discharged_capacity_As: discharged_capacity_As,
 			temperature: temperature,
 			humidity: humidity
 		},
