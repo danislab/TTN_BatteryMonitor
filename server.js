@@ -41,29 +41,33 @@ ttn.data(appID, accessKey)
       console.log("Received uplink from ", devID, "counter", payload.counter)
       //console.log(payload.payload_fields.measurement)
 
-      pg_db.query('INSERT INTO measurements(deviceid, counter, time, soc, soh, \
-        cell_voltage_mean, cell_voltage_min, cell_voltage_max, \
-        temperature_mean, temperature_min, temperature_max, \
-        charged_capacity_1cs, discharged_capacity_1cs \
-      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
-      [payload.dev_id,
-      payload.counter,
-      payload.metadata.time,
-      payload.payload_fields.measurement.soc,
-      payload.payload_fields.measurement.soh,
-      payload.payload_fields.measurement.cell_voltage_mean,
-      payload.payload_fields.measurement.cell_voltage_min,
-      payload.payload_fields.measurement.cell_voltage_max,
-      payload.payload_fields.measurement.temperature_mean,
-      payload.payload_fields.measurement.temperature_min,
-      payload.payload_fields.measurement.temperature_max,
-      payload.payload_fields.measurement.charged_capacity_1cs,
-      payload.payload_fields.measurement.discharged_capacity_1cs], (err, res) => { });
+      try {
+        pg_db.query('INSERT INTO measurements(deviceid, counter, time, soc, soh, \
+          cell_voltage_mean, cell_voltage_min, cell_voltage_max, \
+          temperature_mean, temperature_min, temperature_max, \
+          charged_capacity_1cs, discharged_capacity_1cs \
+        ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
+        [payload.dev_id,
+        payload.counter,
+        payload.metadata.time,
+        payload.payload_fields.measurement.soc,
+        payload.payload_fields.measurement.soh,
+        payload.payload_fields.measurement.cell_voltage_mean,
+        payload.payload_fields.measurement.cell_voltage_min,
+        payload.payload_fields.measurement.cell_voltage_max,
+        payload.payload_fields.measurement.temperature_mean,
+        payload.payload_fields.measurement.temperature_min,
+        payload.payload_fields.measurement.temperature_max,
+        payload.payload_fields.measurement.charged_capacity_1cs,
+        payload.payload_fields.measurement.discharged_capacity_1cs], (err, res) => { });
 
-      // store entire JSON string
-      pg_db.query('INSERT INTO raw_data (json_string) VALUES($1)', [JSON.stringify(payload)], (err, res) => { });
-      io.emit('chat message', [JSON.stringify(payload)]);
-      //io.emit('table', payload.metadata.time);
+        // store entire JSON string
+        pg_db.query('INSERT INTO raw_data (json_string) VALUES($1)', [JSON.stringify(payload)], (err, res) => { });
+        io.emit('chat message', [JSON.stringify(payload)]);
+      } catch (err) {
+        console.error('There was an error in payload', err);
+      }
+
       pg_db.query('SELECT * FROM measurements', (err, res) => {
         io.emit('table', JSON.stringify(res.rows));
       });
