@@ -63,10 +63,11 @@ ORDER BY
 var time = '2018-03-30T18:43:02.242987091Z';
 console.log(time);
 */
-pg_db.query('SELECT * FROM measurements', (err, res) => {
-  //console.log('queried',res.rows);
-  console.log(JSON.stringify(res.rows[1]))
-});
+pg_db.query('INSERT INTO measurements(deviceid, counter, time, cell_voltage_mean, temperature_mean) VALUES($1, $2, $3, $4, $5)', ['battery002',1,'2018-03-30T17:05:35.156194462Z',1.124,25.1], (err, res) => { });
+pg_db.query('INSERT INTO measurements(deviceid, counter, time, cell_voltage_mean, temperature_mean) VALUES($1, $2, $3, $4, $5)', ['battery002',1,'2018-03-30T17:05:36.156194462Z',2.124,26.1], (err, res) => { });
+pg_db.query('INSERT INTO measurements(deviceid, counter, time, cell_voltage_mean, temperature_mean) VALUES($1, $2, $3, $4, $5)', ['battery002',1,'2018-03-30T17:05:37.156194462Z',3.124,27.1], (err, res) => { });
+pg_db.query('INSERT INTO measurements(deviceid, counter, time, cell_voltage_mean, temperature_mean) VALUES($1, $2, $3, $4, $5)', ['battery002',1,'2018-03-30T17:05:38.156194462Z',4.124,28.1], (err, res) => { });
+pg_db.query('INSERT INTO measurements(deviceid, counter, time, cell_voltage_mean, temperature_mean) VALUES($1, $2, $3, $4, $5)', ['battery002',1,'2018-03-30T17:05:39.156194462Z',5.124,29.1], (err, res) => { });
 
 /*
 app.get('/:id', (req, res, next) => {
