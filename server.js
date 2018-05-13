@@ -68,7 +68,7 @@ ttn.data(appID, accessKey)
         console.error('There was an error in payload', err);
       }
 
-      pg_db.query('SELECT * FROM measurements', (err, res) => {
+      pg_db.query('SELECT DISTINCT ON (deviceid) * FROM measurements ORDER BY deviceid, "time" DESC;', (err, res) => {
         io.emit('table', JSON.stringify(res.rows));
       });
     })
@@ -92,7 +92,7 @@ app.get('/console', function(req, res){
 
 io.on('connection', function(socket){
   console.log('a user connected');
-  pg_db.query('SELECT * FROM measurements', (err, res) => {
+  pg_db.query('SELECT DISTINCT ON (deviceid) * FROM measurements ORDER BY deviceid, "time" DESC;', (err, res) => {
     io.emit('table', JSON.stringify(res.rows));
   });
   socket.on('chat message', function(msg){
