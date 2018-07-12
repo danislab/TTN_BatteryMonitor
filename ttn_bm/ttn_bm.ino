@@ -46,8 +46,6 @@ void os_getArtEui (u1_t* buf) { }
 void os_getDevEui (u1_t* buf) { }
 void os_getDevKey (u1_t* buf) { }
 
-static uint8_t mydata[] = "ABCDEFGH";
-uint8_t measurement[4];
 static osjob_t sendjob;
 
 // Schedule TX every this many seconds (might become longer due to duty
@@ -130,28 +128,10 @@ void onEvent (ev_t ev) {
   }
 }
 
-//void do_send(osjob_t* j) {
-//  // Check if there is not a current TX/RX job running
-//  if (LMIC.opmode & OP_TXRXPEND) {
-//    Serial.println(F("OP_TXRXPEND, not sending"));
-//  } else {
-//    // Prepare upstream data transmission at the next possible time.
-//    LMIC_setTxData2(1, mydata, sizeof(mydata) - 1, 0);
-//    Serial.println(F("Packet queued"));
-//  }
-//  // Next TX is scheduled after TX_COMPLETE event.
-//}
-
 void do_send(osjob_t* j) {
-  byte buffer[8];
   sensorValue = analogRead(analogInPin);
-  float temperature = random(10, 30)/10 - 10;
   float h = map(sensorValue, 0, 1024, 0, 100);
-  int32_t temp = temperature * 10;
-  int32_t humidity = round(h);
-  measurement[0] = temp;
-  measurement[1] = humidity;
-
+  uint8_t SOC_poti = round(h);
 
   uint8_t data_buffer[11];
   
@@ -171,7 +151,7 @@ void do_send(osjob_t* j) {
   uint8_t temperature_min_offset;
   uint8_t temperature_max_offset;
 
-  uint8_t SOC = 73;
+  uint8_t SOC = SOC_poti;
   uint8_t SOH = random(0, 100);
 
   uint8_t charged_capacity_As = 50;
@@ -185,7 +165,6 @@ void do_send(osjob_t* j) {
   temperature_min_offset = (BMS_temperature_mean - BMS_temperature_min) * 128 / 20;
   temperature_max_offset = (BMS_temperature_max - BMS_temperature_mean) * 128 / 20;
   
-  //data_buffer[0] = highByte(temperature_mean_offset);
   data_buffer[0] = ((temperature_mean_offset & 0x03FC) >> 2);
   data_buffer[1] = ((temperature_min_offset & 0x7E) >> 1) + ((temperature_mean_offset & 3) << 6);
   data_buffer[2] = ((temperature_min_offset & 0x01) << 7) + (temperature_max_offset & 0x7F);
